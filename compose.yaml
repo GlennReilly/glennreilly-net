@@ -1,0 +1,41 @@
+name: demos
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./sites:/srv:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [web]
+
+  # ---- Container demos ---------------------------------------------------
+  # Each demo repo publishes an image to GHCR; its workflow then SSHes in and
+  # runs `scripts/deploy.sh <service>`. Keep mem_limit modest: this is a small box.
+  #
+  # Uncomment once the first image has been pushed (see README).
+  # year-round:
+  #   image: ghcr.io/glennreilly/year-round:latest
+  #   restart: unless-stopped
+  #   environment:
+  #     PORT: "8080"
+  #     JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75"
+  #   mem_limit: 384m
+  #   networks: [web]
+
+  # >>> new demo services are inserted above this line by tools/NewDemo.main.kts
+
+networks:
+  web: {}
+
+volumes:
+  caddy_data: {}
+  caddy_config: {}

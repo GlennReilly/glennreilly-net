@@ -1,0 +1,45 @@
+# Reverse proxy + static file server for glennreilly.net and its demo subdomains.
+# Caddy obtains and renews a Let's Encrypt cert for every hostname below automatically.
+# ACME_EMAIL comes from /opt/demos/.env on the server (never committed).
+
+{
+	email {$ACME_EMAIL}
+}
+
+(common) {
+	encode zstd gzip
+	header {
+		-Server
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+}
+
+# ---- Landing page --------------------------------------------------------
+glennreilly.net {
+	import common
+	root * /srv/root
+	file_server
+}
+
+www.glennreilly.net {
+	redir https://glennreilly.net{uri} permanent
+}
+
+# ---- Demos ---------------------------------------------------------------
+# Static demo: plain files in ./sites/<slug>, served directly by Caddy.
+hello.glennreilly.net {
+	import common
+	root * /srv/hello
+	file_server
+}
+
+# Container demos are proxied to their compose service by name.
+# Uncomment once ghcr.io/glennreilly/year-round has been published (see README).
+# year-round.glennreilly.net {
+# 	import common
+# 	reverse_proxy year-round:8080
+# }
+
+# >>> new demos are inserted above this line by tools/NewDemo.main.kts

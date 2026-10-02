@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glenn Reilly · Experiments</title>
+<meta name="description" content="A collection of small software experiments by Glenn Reilly.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='none' stroke='%232f7d5b' stroke-width='3'/><circle cx='16' cy='16' r='4' fill='%232f7d5b'/></svg>">
+<style>
+  :root {
+    --bg: #f6f4ef; --surface: #fffdf8; --text: #1d1f1c; --muted: #61655e;
+    --line: #e2ded4; --accent: #2f7d5b; --accent-soft: #e3efe8; --soon: #8a6d1f; --soon-soft: #f4ecd6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141613; --surface: #1c1f1b; --text: #e9e7e1; --muted: #9da197;
+      --line: #2c302a; --accent: #6cc39a; --accent-soft: #1f3329; --soon: #d9b65a; --soon-soft: #332b17;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 72px 20px 48px; }
+  header h1 { font-size: clamp(2rem, 5vw, 2.8rem); letter-spacing: -0.02em; margin: 0 0 8px; line-height: 1.1; }
+  header p { color: var(--muted); margin: 0; max-width: 56ch; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); margin-top: 40px; }
+  .card {
+    display: flex; flex-direction: column; gap: 10px; padding: 20px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    color: inherit; text-decoration: none; transition: border-color .15s, transform .15s;
+  }
+  a.card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  a.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .card h2 { font-size: 1.1rem; margin: 0; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .card p { margin: 0; color: var(--muted); font-size: .95rem; flex: 1; }
+  .host { font: 13px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--accent); word-break: break-all; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+  .badge { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; background: var(--soon-soft); color: var(--soon); white-space: nowrap; }
+  .card.soon { opacity: .8; }
+  .repo { font-size: 13px; color: var(--muted); }
+  footer { margin-top: 56px; color: var(--muted); font-size: 14px; }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Experiments</h1>
+    <p>Small things I've built to try out an idea, a library or a whole stack. Each one lives on its own subdomain and may use a different technology.</p>
+  </header>
+  <section class="grid" id="demos" aria-live="polite"></section>
+  <footer>Glenn Reilly · <a href="https://github.com/GlennReilly">GitHub</a></footer>
+</main>
+<script>
+  const host = location.hostname.replace(/^www\./, '') || 'glennreilly.net';
+  const el = (tag, attrs = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+    n.append(...kids);
+    return n;
+  };
+  fetch('demos.json', { cache: 'no-cache' })
+    .then(r => r.json())
+    .then(demos => {
+      const grid = document.getElementById('demos');
+      for (const d of demos) {
+        const live = d.status !== 'soon';
+        const url = d.url || `https://${d.slug}.${host}/`;
+        const title = el('h2', {}, d.title);
+        if (!live) title.append(el('span', { class: 'badge' }, 'Coming soon'));
+        const card = el(live ? 'a' : 'div', live ? { class: 'card', href: url } : { class: 'card soon' },
+          title,
+          el('span', { class: 'host' }, `${d.slug}.${host}`),
+          el('p', {}, d.description || ''),
+          el('div', { class: 'tags' }, ...(d.tech || []).map(t => el('span', { class: 'tag' }, t)))
+        );
+        grid.append(card);
+      }
+    })
+    .catch(() => { document.getElementById('demos').textContent = 'Could not load the demo list.'; });
+</script>
+</body>
+</html>

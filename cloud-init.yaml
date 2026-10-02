@@ -1,0 +1,56 @@
+#cloud-config
+# Paste into "Advanced options → Add Initialization scripts (user data)" when creating the Droplet.
+# Replace the two __PLACEHOLDERS__ first.
+#
+# Result: Ubuntu 24.04 with Docker, a firewall, 2 GB swap, automatic security updates,
+# and a `deploy` user (docker group) that GitHub Actions uses to push updates into /opt/demos.
+
+package_update: true
+package_upgrade: true
+packages:
+  - ca-certificates
+  - curl
+  - rsync
+  - ufw
+  - fail2ban
+  - unattended-upgrades
+
+users:
+  - default
+  - name: deploy
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - __DEPLOY_PUBLIC_KEY__
+
+swap:
+  filename: /swapfile
+  size: 2G
+
+write_files:
+  - path: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+  - path: /etc/ssh/sshd_config.d/10-hardening.conf
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+  - path: /opt/demos/.env
+    permissions: "0600"
+    content: |
+      ACME_EMAIL=__ACME_EMAIL__
+
+runcmd:
+  - curl -fsSL https://get.docker.com | sh
+  - usermod -aG docker deploy
+  - chown -R deploy:deploy /opt/demos
+  - ufw allow OpenSSH
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw allow 443/udp
+  - ufw --force enable
+  - systemctl restart ssh
+  # If site files were bundled into write_files, start the stack now; otherwise the
+  # first run of .github/workflows/deploy.yml syncs them and starts it.
+  - '[ -f /opt/demos/compose.yaml ] && su - deploy -c "cd /opt/demos && docker compose up -d" || true'

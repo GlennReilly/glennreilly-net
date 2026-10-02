@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hello · glennreilly.net</title>
+<style>
+  :root { --bg: #f6f4ef; --text: #1d1f1c; --muted: #61655e; --accent: #2f7d5b; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #141613; --text: #e9e7e1; --muted: #9da197; --accent: #6cc39a; } }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--text);
+         font: 17px/1.6 ui-sans-serif, system-ui, sans-serif; padding: 20px; box-sizing: border-box; }
+  main { max-width: 34rem; }
+  h1 { margin: 0 0 .3em; }
+  p { color: var(--muted); }
+  code { color: var(--accent); }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Hello, subdomain</h1>
+  <p>This page is served as a static file straight from <code>sites/hello/</code> by Caddy, over HTTPS with an automatically issued certificate.</p>
+  <p>Any folder you add under <code>sites/</code>, plus a three-line block in the <code>Caddyfile</code>, becomes a new demo.</p>
+  <p><a href="https://glennreilly.net/">← All experiments</a></p>
+</main>
+</body>
+</html>
