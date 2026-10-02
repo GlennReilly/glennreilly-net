@@ -36,10 +36,9 @@ hello.glennreilly.net {
 }
 
 # Container demos are proxied to their compose service by name.
-# Uncomment once ghcr.io/glennreilly/year-round has been published (see README).
-# year-round.glennreilly.net {
-# 	import common
-# 	reverse_proxy year-round:8080
-# }
+year-round.glennreilly.net {
+	import common
+	reverse_proxy year-round:8080
+}
 
 # >>> new demos are inserted above this line by tools/NewDemo.main.kts

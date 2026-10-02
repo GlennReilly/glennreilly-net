@@ -12,6 +12,6 @@
     "description": "A radial climate chart: a whole year of weather on one wheel.",
     "tech": ["Kotlin", "Ktor", "Kotlin/JS", "SVG"],
     "repo": "https://github.com/GlennReilly/year-round",
-    "status": "soon"
+    "status": "live"
   }
 ]

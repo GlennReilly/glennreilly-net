@@ -21,15 +21,13 @@ services:
   # Each demo repo publishes an image to GHCR; its workflow then SSHes in and
   # runs `scripts/deploy.sh <service>`. Keep mem_limit modest: this is a small box.
   #
-  # Uncomment once the first image has been pushed (see README).
-  # year-round:
-  #   image: ghcr.io/glennreilly/year-round:latest
-  #   restart: unless-stopped
-  #   environment:
-  #     PORT: "8080"
-  #     JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75"
-  #   mem_limit: 384m
-  #   networks: [web]
+  year-round:
+    image: ghcr.io/glennreilly/year-round:latest
+    restart: unless-stopped
+    environment:
+      PORT: "8080"
+    mem_limit: 384m
+    networks: [web]
 
   # >>> new demo services are inserted above this line by tools/NewDemo.main.kts
 
