@@ -1,5 +1,5 @@
 #cloud-config
-# Paste into "Advanced options → Add Initialization scripts (user data)" when creating the Droplet.
+# Paste into "Advanced options > Add Initialization scripts (user data)" when creating the Droplet.
 # Replace the two __PLACEHOLDERS__ first.
 #
 # Result: Ubuntu 24.04 with Docker, a firewall, 2 GB swap, automatic security updates,

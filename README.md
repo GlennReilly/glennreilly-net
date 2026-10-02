@@ -32,6 +32,7 @@ cloud-init.yaml           first-boot setup for the Droplet
 templates/ktor-demo/      Dockerfile + publish workflow + Ktor notes for a demo repo
 templates/static-build-demo/  Dockerfile for build-then-static demos
 tools/NewDemo.main.kts    scaffolds a new demo (Kotlin script, no dependencies)
+scripts/server-setup.sh   manual equivalent of cloud-init.yaml (if user data fails)
 ```
 
 ## Adding a demo
