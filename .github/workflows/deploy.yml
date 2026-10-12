@@ -11,6 +11,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# This job holds the root-equivalent deploy key: read-only token, and actions pinned to commit SHAs
+# (Dependabot moves the SHA and the version comment together).
+permissions:
+  contents: read
+
 concurrency:
   group: deploy-infra
   cancel-in-progress: false
@@ -19,7 +24,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Configure SSH
         run: |
