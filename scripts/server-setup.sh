@@ -34,7 +34,9 @@ id deploy >/dev/null 2>&1 || useradd -m -s /bin/bash deploy
 passwd -l deploy >/dev/null
 usermod -aG docker deploy
 install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
-echo "$DEPLOY_PUBKEY" > /home/deploy/.ssh/authorized_keys
+# Append, never overwrite: the file also holds each demo's restricted key (README: Secrets).
+touch /home/deploy/.ssh/authorized_keys
+grep -qxF "$DEPLOY_PUBKEY" /home/deploy/.ssh/authorized_keys || echo "$DEPLOY_PUBKEY" >> /home/deploy/.ssh/authorized_keys
 chown deploy:deploy /home/deploy/.ssh/authorized_keys
 chmod 600 /home/deploy/.ssh/authorized_keys
 
