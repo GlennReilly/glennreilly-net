@@ -9,8 +9,10 @@
 # Only production pushes :latest: the Droplet runs :latest, and any infra-repo deploy (`deploy.sh all`)
 # pulls it, so a :latest from main would put unreleased code live.
 #
-# Repo secrets required (same values as the infra repo):
-#   DEPLOY_HOST, DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS
+# Repo secrets required (glennreilly-net README: Secrets):
+#   DEPLOY_HOST, DEPLOY_KNOWN_HOSTS  same values as the infra repo
+#   DEPLOY_SSH_KEY                   this demo's own key, restricted on the Droplet to `deploy.sh <slug>`
+#                                    (never the infra repo's key: that one is root-equivalent)
 name: Publish demo
 
 on:

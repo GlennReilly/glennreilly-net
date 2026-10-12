@@ -21,7 +21,10 @@ users:
     shell: /bin/bash
     lock_passwd: true
     ssh_authorized_keys:
+      # This repo's key: unrestricted (rsync + deploy.sh all). Docker group = root-equivalent; keep it in this repo only.
       - __DEPLOY_PUBLIC_KEY__
+      # Each container demo has its own key, allowed to run only its own deploy (README: Secrets), e.g.:
+      # - 'command="bash /opt/demos/scripts/deploy.sh year-round",restrict __YEAR_ROUND_DEPLOY_PUBLIC_KEY__'
 
 swap:
   filename: /swapfile
