@@ -20,6 +20,9 @@ RUN if [ -n "$SERVER_MODULE" ]; then TASK=":${SERVER_MODULE}:installDist"; DIST=
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /out /app
+# Run as an unprivileged user (the files stay root-owned and read-only to it; write elsewhere, e.g. /tmp).
+RUN addgroup -S app && adduser -S -G app app
+USER app
 ENV PORT=8080
 EXPOSE 8080
 # The Ktor server must bind 0.0.0.0 and read PORT (see README in this folder).

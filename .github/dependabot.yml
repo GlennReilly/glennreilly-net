@@ -1,0 +1,8 @@
+# Weekly PRs for the GitHub Actions in this repo (pinned to SHAs in deploy.yml).
+# The templates/ workflows are copied into demo repos, so they're updated there, not here.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
