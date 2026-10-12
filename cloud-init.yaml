@@ -22,6 +22,8 @@ users:
     lock_passwd: true
     ssh_authorized_keys:
       - __DEPLOY_PUBLIC_KEY__
+      - 'command="bash /opt/demos/scripts/deploy.sh riffomatic",restrict __RIFFOMATIC_DEPLOY_PUBLIC_KEY__'
+
 
 swap:
   filename: /swapfile
