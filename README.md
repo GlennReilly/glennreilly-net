@@ -49,10 +49,13 @@ The script adds the Caddy block, the compose service (container demos), the `sit
 
 For a **container** demo, also:
 
-1. Copy `templates/ktor-demo/Dockerfile` (or `templates/static-build-demo/Dockerfile`) and `templates/ktor-demo/.github/workflows/publish.yml` into the demo repo. Set `SERVICE:` in `publish.yml` to the slug.
+1. Copy `templates/ktor-demo/Dockerfile` (or `templates/static-build-demo/Dockerfile`) and `templates/ktor-demo/.github/workflows/publish.yml` into the demo repo. In `publish.yml`, set `SERVICE:` to the slug and `HEALTH_URL:` to a URL that answers 200 when the demo works (`/health` if it has one).
 2. Add the three `DEPLOY_*` secrets to the demo repo (below).
-3. Push. The workflow builds and pushes `ghcr.io/glennreilly/<slug>`, then SSHes in and runs `deploy.sh <slug>`.
-4. Once the first image exists, set `"status": "live"` in `sites/root/demos.json` and push this repo.
+3. Push to `main`. The workflow builds and pushes `ghcr.io/glennreilly/<slug>:<sha>`. **It doesn't deploy:** pushes to `main` never go live.
+4. Release by fast-forwarding the `production` branch: `git push origin origin/main:production`. That run also pushes `:latest`, SSHes in to run `deploy.sh <slug>`, and waits for `HEALTH_URL`. The first time, push this repo's Caddy and compose changes before the deploy runs, or re-run the deploy afterwards.
+5. Once it's up, set `"status": "live"` in `sites/root/demos.json` and push this repo.
+
+Only `production` pushes the `:latest` tag. The Droplet runs `:latest`, and every push to this repo runs `deploy.sh all`, which pulls it, so a demo's `main` must never push `:latest`. Roll back a demo with `git push --force origin <good-sha>:production` in its repo.
 
 **Private demo repos:** GHCR packages inherit the repo's visibility, so the Droplet can't pull a private one anonymously. Either make the *package* public (GitHub → Packages → year-round → Package settings → Change visibility; the source stays private) or log the Droplet in once:
 
