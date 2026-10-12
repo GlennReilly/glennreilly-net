@@ -41,4 +41,9 @@ year-round.glennreilly.net {
 	reverse_proxy year-round:8080
 }
 
+riffomatic.glennreilly.net {
+	import common
+	reverse_proxy riffomatic:8080
+}
+
 # >>> new demos are inserted above this line by tools/NewDemo.main.kts

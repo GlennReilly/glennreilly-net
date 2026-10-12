@@ -13,5 +13,13 @@
     "tech": ["Kotlin", "Ktor", "Kotlin/JS", "SVG"],
     "repo": "https://github.com/GlennReilly/year-round",
     "status": "live"
+  },
+  {
+    "slug": "riffomatic",
+    "title": "Riffomatic 3000",
+    "description": "Looping chord progressions and melodies in any key and mode, as notation and guitar tab, with playback and MIDI download.",
+    "tech": ["Kotlin", "Kotlin/JS", "TypeScript", "alphaTab"],
+    "repo": "https://github.com/GlennReilly/riffomatic",
+    "status": "soon"
   }
 ]

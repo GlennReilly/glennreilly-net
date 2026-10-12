@@ -29,6 +29,13 @@ services:
     mem_limit: 384m
     networks: [web]
 
+  # Static site (Caddy inside the image serves the Vite build); tiny footprint.
+  riffomatic:
+    image: ghcr.io/glennreilly/riffomatic:latest
+    restart: unless-stopped
+    mem_limit: 64m
+    networks: [web]
+
   # >>> new demo services are inserted above this line by tools/NewDemo.main.kts
 
 networks:
