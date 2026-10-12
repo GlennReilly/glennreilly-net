@@ -108,7 +108,7 @@ addToIndex(demo)
 println("Added ${demo.slug}.$domain (${demo.kind::class.simpleName}).")
 if (demo.kind is Kind.Container) {
     println("Next: add templates/ktor-demo (or static-build-demo) Dockerfile + publish.yml to the demo repo,")
-    println("push once so ghcr.io/$owner/${demo.slug} exists, then set its status to \"live\" in demos.json and push this repo.")
+    println("release once (git push origin origin/main:production) so ghcr.io/$owner/${demo.slug}:latest exists, then set its status to \"live\" in demos.json and push this repo.")
 } else {
     println("Next: put your files in sites/${demo.slug}/ and push this repo.")
 }

@@ -1,5 +1,13 @@
-# Copy to .github/workflows/publish.yml in the demo repo.
-# Builds the image, pushes it to GHCR, then tells the Droplet to restart this one service.
+# Copy to .github/workflows/publish.yml in the demo repo. Set SERVICE and HEALTH_URL.
+#
+# Releases go through the `production` branch, so a push to main never goes live:
+#   main        build the image and push ghcr.io/…/<slug>:<sha>.
+#   production  the same, plus :latest, then restart this one service on the Droplet and wait for it to stay healthy.
+# Release with a fast-forward: `git push origin origin/main:production` (use `master` if that's the default branch).
+# Roll back with `git push --force origin <good-sha>:production`.
+#
+# Only production pushes :latest: the Droplet runs :latest, and any infra-repo deploy (`deploy.sh all`)
+# pulls it, so a :latest from main would put unreleased code live.
 #
 # Repo secrets required (same values as the infra repo):
 #   DEPLOY_HOST, DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS
@@ -7,11 +15,13 @@ name: Publish demo
 
 on:
   push:
-    branches: [main]
+    branches: [main, production]
   workflow_dispatch:
 
 env:
-  SERVICE: year-round # must match the service name in glennreilly-net/compose.yaml
+  SERVICE: my-demo # must match the service name in glennreilly-net/compose.yaml
+  # A page or endpoint that answers 200 when the demo works; point it at /health if the app has one.
+  HEALTH_URL: https://my-demo.glennreilly.net/
 
 jobs:
   publish:
@@ -20,33 +30,39 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Image name
+      - name: Image tags
         id: img
-        run: echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${SERVICE}" >> "$GITHUB_OUTPUT"
+        run: |
+          name="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${SERVICE}"
+          {
+            echo "tags<<EOF"
+            echo "${name}:${GITHUB_SHA}"
+            if [ "$GITHUB_REF" = refs/heads/production ]; then echo "${name}:latest"; fi
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: .
           push: true
           platforms: linux/amd64
-          tags: |
-            ${{ steps.img.outputs.name }}:latest
-            ${{ steps.img.outputs.name }}:${{ github.sha }}
+          tags: ${{ steps.img.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   deploy:
     needs: publish
+    if: github.ref == 'refs/heads/production'
     runs-on: ubuntu-latest
     concurrency: deploy-${{ github.repository }}
     steps:
@@ -57,3 +73,24 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           echo "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           ssh deploy@${{ secrets.DEPLOY_HOST }} "bash /opt/demos/scripts/deploy.sh ${SERVICE}"
+
+      # The restart returns as soon as the container starts, even if it then crash-loops.
+      # Wait for HEALTH_URL through Caddy, and require a few passes in a row so a container
+      # that answers once and then dies still fails the deploy.
+      - name: Wait for the service to be healthy
+        run: |
+          passes=0
+          for attempt in $(seq 1 36); do
+            if curl -fsS --max-time 5 "$HEALTH_URL" > /dev/null; then
+              passes=$((passes + 1))
+              if [ "$passes" -ge 3 ]; then
+                echo "Healthy after $attempt checks"
+                exit 0
+              fi
+            else
+              passes=0
+            fi
+            sleep 5
+          done
+          echo "::error::$HEALTH_URL did not stay healthy within 3 minutes. Check 'docker compose logs ${SERVICE}' on the Droplet."
+          exit 1
