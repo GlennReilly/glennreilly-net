@@ -60,8 +60,11 @@ Only `production` pushes the `:latest` tag. The Droplet runs `:latest`, and ever
 **Private demo repos:** GHCR packages inherit the repo's visibility, so the Droplet can't pull a private one anonymously. Either make the *package* public (GitHub → Packages → year-round → Package settings → Change visibility; the source stays private) or log the Droplet in once:
 
 ```bash
-ssh deploy@glennreilly.net 'echo <PAT with read:packages> | docker login ghcr.io -u GlennReilly --password-stdin'
+ssh root@glennreilly.net
+su - deploy -c 'docker login ghcr.io -u GlennReilly'   # paste the token at the prompt, not on the command line
 ```
+
+Prefer making the package public. The login stores the token **in plain text** in `/home/deploy/.docker/config.json`, readable by anything that runs as `deploy` (including each demo's deploy key, through its deploy script's Docker access). A classic token with `read:packages` can read *all* your packages, private ones included. If you must log in, use a token with no other scopes, and revoke it when the package goes public.
 
 ### year-round specifics
 
@@ -110,6 +113,7 @@ bash scripts/deploy.sh all                      # redeploy everything
 ```
 
 - Security updates install automatically (unattended-upgrades). Reboot occasionally for kernel updates: `sudo reboot`. Everything restarts on boot (`restart: unless-stopped`).
-- The firewall (ufw) allows only 22, 80 and 443.
+- The firewall (ufw) allows only 22, 80 and 443. **Docker bypasses ufw:** a port published with `ports:` in `compose.yaml` is reachable from the internet whatever ufw says. Only `caddy` publishes ports. Demos must stay on the `web` network behind it and never get a `ports:` line.
+- Root can still log in over SSH with your key (password logins are off, and fail2ban is on). To tighten it, create a sudo user, check you can log in as it, then set `PermitRootLogin no` in `/etc/ssh/sshd_config.d/10-hardening.conf` and restart ssh.
 - Running short on memory? Each JVM demo uses roughly 150–350 MB. Resize the Droplet in the DO console (CPU/RAM only, so you can scale back down) or lower `mem_limit`.
 - Enable DigitalOcean **Backups** (+20%) or take a snapshot before big changes. Everything except `.env` and the Caddy cert volume is rebuilt from git anyway.
