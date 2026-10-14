@@ -1,5 +1,10 @@
 # Deploys this infra repo (Caddyfile, compose.yaml, static sites) to the Droplet.
 #
+# Releases go through the `production` branch, as in the demo repos:
+#   main        runs the checks only. Never touches the live site.
+#   production  runs the checks, then deploys and waits for the sites to stay healthy.
+# Release with a fast-forward: `git push origin main:production`.
+#
 # Repo secrets required:
 #   DEPLOY_HOST         Droplet IP (or glennreilly.net once DNS is live)
 #   DEPLOY_SSH_KEY      private key for the `deploy` user
@@ -8,7 +13,7 @@ name: Deploy infra
 
 on:
   push:
-    branches: [main]
+    branches: [main, production]
   workflow_dispatch:
 
 # This job holds the root-equivalent deploy key: read-only token, and actions pinned to commit SHAs
@@ -21,7 +26,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
+
   deploy:
+    needs: checks
+    if: github.ref == 'refs/heads/production'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -42,3 +52,26 @@ jobs:
 
       - name: Restart stack
         run: ssh deploy@${{ secrets.DEPLOY_HOST }} 'bash /opt/demos/scripts/deploy.sh all'
+
+      # The restart returns as soon as the containers start, even if one then crash-loops.
+      # Require a few passes in a row for the landing page and every live demo.
+      - name: Wait for the sites to be healthy
+        run: |
+          urls="https://glennreilly.net/"
+          for slug in $(jq -r '.[] | select(.status == "live") | .slug' sites/root/demos.json); do
+            urls="$urls https://${slug}.glennreilly.net/"
+          done
+          for url in $urls; do
+            passes=0
+            for attempt in $(seq 1 36); do
+              if curl -fsS --max-time 5 "$url" > /dev/null; then
+                passes=$((passes + 1))
+                [ "$passes" -ge 3 ] && { echo "$url healthy after $attempt checks"; continue 2; }
+              else
+                passes=0
+              fi
+              sleep 5
+            done
+            echo "::error::$url did not stay healthy within 3 minutes"
+            exit 1
+          done
