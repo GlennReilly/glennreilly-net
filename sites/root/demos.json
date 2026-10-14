@@ -1,16 +1,14 @@
 [
   {
-    "slug": "hello",
-    "title": "Hello, subdomain",
-    "description": "A plain static page proving the wiring works: DNS, HTTPS and Caddy.",
-    "tech": ["HTML", "CSS"],
-    "status": "live"
-  },
-  {
     "slug": "year-round",
     "title": "Year Round",
     "description": "A radial climate chart: a whole year of weather on one wheel.",
-    "tech": ["Kotlin", "Ktor", "Kotlin/JS", "SVG"],
+    "tech": [
+      "Kotlin",
+      "Ktor",
+      "Kotlin/JS",
+      "SVG"
+    ],
     "repo": "https://github.com/GlennReilly/year-round",
     "status": "live"
   },
@@ -18,8 +16,13 @@
     "slug": "riffomatic",
     "title": "Riffomatic 3000",
     "description": "Looping chord progressions and melodies in any key and mode, as notation and guitar tab, with playback and MIDI download.",
-    "tech": ["Kotlin", "Kotlin/JS", "TypeScript", "alphaTab"],
+    "tech": [
+      "Kotlin",
+      "Kotlin/JS",
+      "TypeScript",
+      "alphaTab"
+    ],
     "repo": "https://github.com/GlennReilly/riffomatic",
-    "status": "soon"
+    "status": "live"
   }
 ]
