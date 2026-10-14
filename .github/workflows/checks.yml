@@ -1,0 +1,30 @@
+# Reusable: every check that must pass before merge or deploy.
+name: Checks
+
+on:
+  workflow_call:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: demos.json is valid and every live demo has a Caddy block
+        run: |
+          jq -e 'type == "array" and all(.[]; (.slug | type == "string") and (.title | type == "string"))' sites/root/demos.json
+          for slug in $(jq -r '.[] | select(.status == "live") | .slug' sites/root/demos.json); do
+            grep -q "^${slug}\.glennreilly\.net {" Caddyfile || { echo "::error::live demo '$slug' has no Caddy block"; exit 1; }
+          done
+
+      - name: Caddyfile is valid
+        run: |
+          docker run --rm -e ACME_EMAIL=ci@example.com \
+            -v "$PWD/Caddyfile:/etc/caddy/Caddyfile:ro" \
+            caddy:2 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+
+      - name: compose.yaml is valid
+        run: ACME_EMAIL=ci@example.com docker compose config --quiet
+
+      - name: Shell scripts pass shellcheck
+        run: shellcheck scripts/*.sh

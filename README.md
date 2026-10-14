@@ -28,7 +28,7 @@ sites/root/               landing page; demos.json drives the cards
 sites/<slug>/             static demos
 scripts/deploy.sh         runs on the Droplet: pull, up, reload Caddy
 cloud-init.yaml           first-boot setup for the Droplet
-.github/workflows/        deploys this repo on push to main
+.github/workflows/        checks on every branch; deploys this repo when `production` is pushed
 templates/ktor-demo/      Dockerfile + publish workflow + Ktor notes for a demo repo
 templates/static-build-demo/  Dockerfile for build-then-static demos
 tools/NewDemo.main.kts    scaffolds a new demo (Kotlin script, no dependencies)
@@ -45,7 +45,7 @@ kotlin tools/NewDemo.main.kts tide-clock static "Tide Clock" "Tides as a clock f
 kotlin tools/NewDemo.main.kts my-app container "My App" "What it does" "Kotlin,Ktor" 8080
 ```
 
-The script adds the Caddy block, the compose service (container demos), the `sites/<slug>/` folder (static demos) and the landing-page card. Commit and push, and the infra workflow deploys it. Caddy fetches the new certificate on the first request; the wildcard DNS record already covers the hostname.
+The script adds the Caddy block, the compose service (container demos), the `sites/<slug>/` folder (static demos) and the landing-page card. Commit and push, then release with `git push origin main:production`: the infra workflow runs the checks, deploys, and waits for every live site to stay healthy (a push to `main` alone only runs the checks). Caddy fetches the new certificate on the first request; the wildcard DNS record already covers the hostname.
 
 For a **container** demo, also:
 
