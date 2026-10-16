@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy policy &middot; TaxReceiptSyncr</title>
+<meta name="description" content="Privacy policy for TaxReceiptSyncr, a personal tool that files receipts from Gmail into Google Drive.">
+<style>
+  :root { --bg: #f6f4ef; --text: #1d1f1c; --muted: #61655e; --accent: #2f7d5b; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #141613; --text: #e9e7e1; --muted: #9da197; --accent: #6cc39a; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.6 ui-sans-serif, system-ui, sans-serif; padding: 20px; }
+  main { max-width: 40rem; margin: 48px auto; }
+  h1 { margin: 0 0 .3em; }
+  h2 { margin-top: 1.6em; }
+  p, li { color: var(--muted); }
+  a { color: var(--accent); }
+  nav { margin-top: 2em; font-size: .95rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Privacy policy</h1>
+  <p>TaxReceiptSyncr &middot; last updated 16 October 2026</p>
+
+  <p>TaxReceiptSyncr is a personal tool written and used only by Glenn Reilly ("the author"), on his own Google account. It is not offered to the public. This policy explains what the app does with Google user data.</p>
+
+  <h2>What the app accesses</h2>
+  <ul>
+    <li><strong>Gmail</strong> (<code>gmail.modify</code>): reads email messages that carry the author's <code>receipts</code> label, including attachments, and applies the labels <code>receipts-done</code> or <code>receipts-needs-review</code>. It does not delete messages.</li>
+    <li><strong>Gmail</strong> (<code>gmail.send</code>): sends a short summary email from the author's address to the same address after a run.</li>
+    <li><strong>Google Drive</strong> (<code>drive</code>): finds and creates folders and uploads receipt PDFs. Full Drive access is needed because narrower access cannot see the author's existing tax folders. The app only creates folders and files inside one designated tax folder. It also searches Drive for files carrying its own marker, to avoid uploading the same receipt twice.</li>
+  </ul>
+
+  <h2>How the data is used</h2>
+  <p>Receipts and invoices are read from the author's mailbox, converted to PDF where necessary, and uploaded to the author's own Google Drive. That is the only purpose. The app runs on GitHub Actions and processes data in memory for the duration of a run.</p>
+
+  <h2>Sharing, selling and advertising</h2>
+  <p>The app does not share, sell or transfer Google user data to anyone. It does not use Google user data for advertising, profiling or training machine-learning models, and no person reads the data other than the author, in his own mailbox and Drive.</p>
+
+  <h2>Storage and retention</h2>
+  <ul>
+    <li>The app has no database and keeps no copy of your mail or receipts. The only stored output is the PDFs uploaded to the author's own Google Drive.</li>
+    <li>Run logs contain only counts, file names and email message IDs. They never contain email bodies, receipt contents or access tokens.</li>
+    <li>The OAuth refresh token is stored as an encrypted secret in a private GitHub repository.</li>
+  </ul>
+
+  <h2>Revoking access</h2>
+  <p>Access can be withdrawn at any time at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. After that the app can no longer read Gmail or Drive.</p>
+
+  <h2>Google API Services User Data Policy</h2>
+  <p>TaxReceiptSyncr's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy: contact Glenn Reilly via <a href="https://github.com/GlennReilly">github.com/GlennReilly</a>.</p>
+
+  <nav>
+    <a href="/taxreceiptsyncr/">&larr; TaxReceiptSyncr</a> &middot;
+    <a href="/taxreceiptsyncr/terms/">Terms of service</a> &middot;
+    <a href="https://glennreilly.net/">All experiments</a>
+  </nav>
+</main>
+</body>
+</html>

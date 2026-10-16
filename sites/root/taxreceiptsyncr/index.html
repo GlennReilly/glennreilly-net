@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TaxReceiptSyncr &middot; glennreilly.net</title>
+<meta name="description" content="TaxReceiptSyncr is a personal tool that files business receipts from Gmail into a Google Drive tax-year folder.">
+<style>
+  :root { --bg: #f6f4ef; --text: #1d1f1c; --muted: #61655e; --accent: #2f7d5b; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #141613; --text: #e9e7e1; --muted: #9da197; --accent: #6cc39a; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.6 ui-sans-serif, system-ui, sans-serif; padding: 20px; }
+  main { max-width: 40rem; margin: 48px auto; }
+  h1 { margin: 0 0 .3em; }
+  p, li { color: var(--muted); }
+  a { color: var(--accent); }
+  nav { margin-top: 2em; font-size: .95rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>TaxReceiptSyncr</h1>
+  <p>TaxReceiptSyncr is a small personal tool that automatically files business receipts and invoices into the right Google Drive tax-year folder.</p>
+  <p>Receipts arrive in the author's own Gmail account (a Bunnings invoice as a PDF attachment, or an Australia Post receipt link forwarded from an SMS). A scheduled job saves each receipt as a PDF in the author's own Google Drive, in a folder named for the Australian financial year (for example <code>2026 - 2027</code>), and then labels the email so it is not processed twice.</p>
+  <h2>Who it is for</h2>
+  <p>It is built for and used only by its author, Glenn Reilly, on his own Google account. It is not offered to the public, has no sign-up, and does not collect data from anyone else.</p>
+  <h2>Google permissions</h2>
+  <p>To do this, the app asks for access to the author's Gmail (read messages, apply labels, send one summary email to himself) and Google Drive (find and create folders and files). The <a href="/taxreceiptsyncr/privacy/">privacy policy</a> explains exactly how that access is used.</p>
+  <nav>
+    <a href="/taxreceiptsyncr/privacy/">Privacy policy</a> &middot;
+    <a href="/taxreceiptsyncr/terms/">Terms of service</a> &middot;
+    <a href="https://glennreilly.net/">&larr; All experiments</a>
+  </nav>
+</main>
+</body>
+</html>
